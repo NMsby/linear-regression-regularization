@@ -175,8 +175,19 @@ def compute_cost_ridge(X, y, weights, bias, lambda_param):
     Returns:
         Mean Squared Error with L2 regularization
     """
-    # TODO: Implement MSE cost function with L2 regularization
-    return None
+    m = X.shape[0]  # Number of samples
+
+    # Calculate predictions
+    y_pred = predict(X, weights, bias)
+
+    # Calculate the error (difference between predictions and actual values)
+    error = y_pred - y
+
+    # Calculate MSE with L2 regularization:
+    # J(w) = (1/2m) * Σ(y_pred - y_actual)² + (λ/2m) * Σw²
+    cost = (1 / (2 * m)) * np.sum(error ** 2) + (lambda_param / (2 * m)) * np.sum(weights ** 2)
+
+    return cost
 
 
 def gradient_descent_ridge(X, y, learning_rate, num_iterations, lambda_param):
@@ -207,7 +218,30 @@ def gradient_descent_ridge(X, y, learning_rate, num_iterations, lambda_param):
     weights_history = np.zeros((num_iterations, n))
     bias_history = np.zeros(num_iterations)
 
-    # TODO: Implement gradient descent algorithm with RIDGE regularization
+    # Implement gradient descent algorithm with RIDGE regularization
+    for i in range(num_iterations):
+        # Calculate predictions
+        y_pred = predict(X, weights, bias)
+
+        # Calculate errors
+        error = y_pred - y
+
+        # Calculate gradients with L2 regularization term
+        # ∂J/∂w = (1/m) * X^T * (y_pred - y) + (λ/m) * w
+        dw = (1 / m) * np.dot(X.T, error) + (lambda_param / m) * weights
+
+        # Bias is not regularized
+        # ∂J/∂b = (1/m) * Σ(y_pred - y)
+        db = (1 / m) * np.sum(error)
+
+        # Update parameters
+        weights = weights - learning_rate * dw
+        bias = bias - learning_rate * db
+
+        # Store parameters and cost
+        weights_history[i] = weights
+        bias_history[i] = bias
+        cost_history[i] = compute_cost_ridge(X, y, weights, bias, lambda_param)
 
     return weights, bias, cost_history, weights_history, bias_history
 
