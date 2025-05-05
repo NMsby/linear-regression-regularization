@@ -25,7 +25,7 @@ def load_and_preprocess_data(file_path):
 
     # Select features for prediction (select at least 5 relevant features)
     # For example: bedrooms, bathrooms, sqft_living, floors, condition, garde, etc.
-    features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'condition', 'grade']
+    features = ['bedrooms', 'bathrooms', 'sqft_living', 'floors', 'grade', 'sqft_above', 'view']
     X = df[features].values
     y = df['price'].values
 
@@ -46,11 +46,12 @@ def load_and_preprocess_data(file_path):
     X_normalized = (X - feature_means) / feature_stds
 
     # Split data into training (80%) and testing (20%) sets
-    # Calculate the split point
-    split_idx = int(X.shape[0] * 0.8)
+    # Set random seed for reproducibility
+    np.random.seed(42)
 
     # Shuffle data (create random indices)
     indices = np.random.permutation(X.shape[0])
+    split_idx = int(X.shape[0] * 0.8)
     train_indices = indices[:split_idx]
     test_indices = indices[split_idx:]
 
@@ -60,7 +61,6 @@ def load_and_preprocess_data(file_path):
     X_test = X_normalized[test_indices]
     y_test = y[test_indices]
 
-    # Convert to NumPy arrays and return
     return X_train, y_train, X_test, y_test
 
 
