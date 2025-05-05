@@ -90,7 +90,7 @@ The project includes the following key components:
 
 4. For detailed analysis, open the Jupyter notebook:
    ```bash
-    jupyter notebook linear_regression_regularization.ipynb
+    jupyter notebook linear-regression-regularization.ipynb
    ```
 
 ## Results
