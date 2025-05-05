@@ -22,11 +22,11 @@ Dataset link: [House Sales in King County, USA](https://www.kaggle.com/datasets/
 
 ```markdown
 linear_regression_regularization/
-├── README.md                          # Project documentation
-├── regularization_starter.py          # Main implementation
-├── linear_regression_regularization.ipynb  # Jupyter notebook with analysis
-├── kc_house_data.csv                  # Dataset (not tracked by git)
-└── .gitignore                         # Git ignore file
+├── README.md                                # Project documentation
+├── regularization_starter.py                # Main implementation
+├── linear-regression-regularization.ipynb   # Jupyter notebook with analysis
+├── kc_house_data.csv                        # Dataset (not tracked by git)
+└── .gitignore                               # Git ignore file
 ```
 
 - `regularization_starter.py`: Main implementation file containing all functions for data preprocessing, model training, and visualization
