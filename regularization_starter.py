@@ -77,8 +77,7 @@ def predict(X, weights, bias):
     Returns:
         Predicted values
     """
-    # TODO: Implement prediction function
-    return None
+    return np.dot(X, weights) + bias
 
 
 def compute_cost(X, y, weights, bias):
@@ -94,8 +93,18 @@ def compute_cost(X, y, weights, bias):
     Returns:
         Mean Squared Error
     """
-    # TODO: Implement MSE cost function
-    return None
+    m = X.shape[0]  # Number of samples
+
+    # Calculate predictions
+    y_pred = predict(X, weights, bias)
+
+    # Calculate the error (difference between predictions and actual values)
+    error = y_pred - y
+
+    # Calculate MSE: J(w) = (1/2m) * Σ(y_pred - y_actual)²
+    cost = (1 / (2 * m)) * np.sum(error ** 2)
+
+    return cost
 
 
 def gradient_descent(X, y, learning_rate, num_iterations):
@@ -125,7 +134,28 @@ def gradient_descent(X, y, learning_rate, num_iterations):
     weights_history = np.zeros((num_iterations, n))
     bias_history = np.zeros(num_iterations)
 
-    # TODO: Implement gradient descent algorithm
+    # Implement gradient descent algorithm
+    for i in range(num_iterations):
+        # Calculate predictions
+        y_pred = predict(X, weights, bias)
+
+        # Calculate errors
+        error = y_pred - y
+
+        # Calculate gradients
+        # ∂J/∂w = (1/m) * X^T * (y_pred - y)
+        dw = (1 / m) * np.dot(X.T, error)
+        # ∂J/∂b = (1/m) * Σ(y_pred - y)
+        db = (1 / m) * np.sum(error)
+
+        # Update parameters
+        weights = weights - learning_rate * dw
+        bias = bias - learning_rate * db
+
+        # Store parameters and cost
+        weights_history[i] = weights
+        bias_history[i] = bias
+        cost_history[i] = compute_cost(X, y, weights, bias)
 
     return weights, bias, cost_history, weights_history, bias_history
 
