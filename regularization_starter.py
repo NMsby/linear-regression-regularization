@@ -410,17 +410,19 @@ if __name__ == "__main__":
     # File path to the dataset
     file_path = "kc_house_data.csv"  # Update with the correct path
 
+    print("Loading and preprocessing data...")
     # Load and preprocess data
     X_train, y_train, X_test, y_test = load_and_preprocess_data(file_path)
 
     # Get feature names for later visualization
-    # TODO: Extract feature names from your selected columns
+    # Matches features selected in load_and_preprocess_data
+    feature_names = ['bedrooms', 'bathrooms', 'sqft_living', 'floors', 'grade', 'sqft_above', 'view']
 
     # Hyperparameters
-    learning_rate = 0.01  # You may need to adjust this
+    learning_rate = 0.01
     num_iterations = 1000
-    ridge_lambda = 0.1  # You may need to adjust this
-    lasso_lambda = 0.01  # You may need to adjust this
+    ridge_lambda = 0.1
+    lasso_lambda = 0.01
 
     print("Training Basic Linear Regression model...")
     basic_weights, basic_bias, basic_cost_history, _, _ = gradient_descent(
