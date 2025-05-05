@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 # ONLY use pandas for initial data loading
 # All other operations should use NumPy
 
@@ -19,18 +20,45 @@ def load_and_preprocess_data(file_path):
         X_test: Testing features
         y_test: Testing target values
     """
-    # TODO: Load data using pandas
+    # Load data using pandas
     df = pd.read_csv(file_path)
 
-    # TODO: Select features for prediction (select at least 5 relevant features)
-    # For example: bedrooms, bathrooms, sqft_living, floors, condition, etc.
-    # You'll need to determine which columns to use after exploring the data
+    # Select features for prediction (select at least 5 relevant features)
+    # For example: bedrooms, bathrooms, sqft_living, floors, condition, garde, etc.
+    features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'condition', 'grade']
+    X = df[features].values
+    y = df['price'].values
 
-    # TODO: Handle any missing values (if necessary)
+    # Handle any missing values (if necessary)
+    # Check for NaN values
+    if np.isnan(X).any():
+        # Replace NaNs with feature means
+        for col in range(X.shape[1]):
+            mask = np.isnan(X[:, col])
+            X[mask, col] = np.mean(X[~mask, col])
 
-    # TODO: Normalize/standardize features
+    # Normalize/standardize features
+    # Compute mean and standard deviation for each feature
+    feature_means = np.mean(X, axis=0)
+    feature_stds = np.std(X, axis=0)
 
-    # TODO: Split data into training (80%) and testing (20%) sets
+    # Standardize features (z-score normalization)
+    X_normalized = (X - feature_means) / feature_stds
+
+    # Split data into training (80%) and testing (20%) sets
+    # Calculate the split point
+    split_idx = int(X.shape[0] * 0.8)
+
+    # Shuffle data (create random indices)
+    indices = np.random.permutation(X.shape[0])
+    train_indices = indices[:split_idx]
+    test_indices = indices[split_idx:]
+
+    # Split the data
+    X_train = X_normalized[train_indices]
+    y_train = y[train_indices]
+    X_test = X_normalized[test_indices]
+    y_test = y[test_indices]
 
     # Convert to NumPy arrays and return
     return X_train, y_train, X_test, y_test
