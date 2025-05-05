@@ -18,6 +18,10 @@ The dataset used in this project is the King County House Sales dataset from Kag
 
 Dataset link: [House Sales in King County, USA](https://www.kaggle.com/datasets/harlfoxem/housesalesprediction)
 
+## Kaggle Notebook
+
+This project is also available as a [Kaggle Notebook](https://www.kaggle.com/code/nelsonmasbayi/linear-regression-l1-and-l2-regularization). The notebook contains a complete implementation of linear regression with gradient descent and regularization techniques, along with visualizations and analysis of the results.
+
 ## Project Structure
 
 ```markdown
