@@ -261,8 +261,19 @@ def compute_cost_lasso(X, y, weights, bias, lambda_param):
     Returns:
         Mean Squared Error with L1 regularization
     """
-    # TODO: Implement MSE cost function with L1 regularization
-    return None
+    m = X.shape[0]  # Number of samples
+
+    # Calculate predictions
+    y_pred = predict(X, weights, bias)
+
+    # Calculate the error (difference between predictions and actual values)
+    error = y_pred - y
+
+    # Calculate MSE with L1 regularization:
+    # J(w) = (1/2m) * Σ(y_pred - y_actual)² + (λ/m) * Σ|w|
+    cost = (1 / (2 * m)) * np.sum(error ** 2) + (lambda_param / m) * np.sum(np.abs(weights))
+
+    return cost
 
 
 def gradient_descent_lasso(X, y, learning_rate, num_iterations, lambda_param):
@@ -293,7 +304,37 @@ def gradient_descent_lasso(X, y, learning_rate, num_iterations, lambda_param):
     weights_history = np.zeros((num_iterations, n))
     bias_history = np.zeros(num_iterations)
 
-    # TODO: Implement gradient descent algorithm with LASSO regularization
+    # Implement gradient descent algorithm with LASSO regularization
+    for i in range(num_iterations):
+        # Calculate predictions
+        y_pred = predict(X, weights, bias)
+
+        # Calculate errors
+        error = y_pred - y
+
+        # Calculate gradient of MSE part
+        dw_mse = (1 / m) * np.dot(X.T, error)
+
+        # Calculate LASSO regularization term (subgradient)
+        # ∂J/∂w = (1/m) * X^T * (y_pred - y) + (λ/m) * sign(w)
+        # sign(w) is +1 for w > 0, -1 for w < 0, and 0 for w = 0
+        dw_lasso = (lambda_param / m) * np.sign(weights)
+
+        # Combine MSE gradient and LASSO regularization
+        dw = dw_mse + dw_lasso
+
+        # Bias is not regularized
+        # ∂J/∂b = (1/m) * Σ(y_pred - y)
+        db = (1 / m) * np.sum(error)
+
+        # Update parameters
+        weights = weights - learning_rate * dw
+        bias = bias - learning_rate * db
+
+        # Store parameters and cost
+        weights_history[i] = weights
+        bias_history[i] = bias
+        cost_history[i] = compute_cost_lasso(X, y, weights, bias, lambda_param)
 
     return weights, bias, cost_history, weights_history, bias_history
 
@@ -396,7 +437,7 @@ if __name__ == "__main__":
         X_train, y_train, learning_rate, num_iterations, lasso_lambda
     )
 
-    # Evaluate models on test set
+    # Evaluate models on the test set
     print("\nEvaluation on Test Set:")
     basic_mse = evaluate_model(X_test, y_test, basic_weights, basic_bias, "Basic Linear Regression")
     ridge_mse = evaluate_model(X_test, y_test, ridge_weights, ridge_bias, "RIDGE Regression")
