@@ -349,11 +349,26 @@ def plot_cost_history(cost_history, title):
         title: Plot title
     """
     plt.figure(figsize=(10, 6))
-    plt.plot(range(len(cost_history)), cost_history)
-    plt.title(title)
-    plt.xlabel('Iteration')
-    plt.ylabel('Cost (MSE)')
-    plt.grid(True)
+    plt.plot(range(len(cost_history)), cost_history, linewidth=2)
+    plt.title(title, fontsize=14)
+    plt.xlabel('Iteration', fontsize=12)
+    plt.ylabel('Cost (MSE)', fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Highlighting initial and final costs
+    plt.annotate(f'Initial cost: {cost_history[0]:.2f}',
+                 xy=(0, cost_history[0]),
+                 xytext=(50, 20),
+                 textcoords='offset points',
+                 arrowprops=dict(arrowstyle='->'))
+
+    plt.annotate(f'Final cost: {cost_history[-1]:.2f}',
+                 xy=(len(cost_history) - 1, cost_history[-1]),
+                 xytext=(-50, -20),
+                 textcoords='offset points',
+                 arrowprops=dict(arrowstyle='->'))
+
+    plt.tight_layout()
     plt.show()
 
 
@@ -367,21 +382,114 @@ def plot_coefficients(feature_names, basic_weights, ridge_weights, lasso_weights
         ridge_weights: Weights from RIDGE regression
         lasso_weights: Weights from LASSO regression
     """
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(14, 8))
     x = np.arange(len(feature_names))
     width = 0.25
 
-    plt.bar(x - width, basic_weights, width, label='Basic')
-    plt.bar(x, ridge_weights, width, label='RIDGE')
-    plt.bar(x + width, lasso_weights, width, label='LASSO')
+    # Create the bars
+    plt.bar(x - width, basic_weights, width, label='Basic', color='blue', alpha=0.7)
+    plt.bar(x, ridge_weights, width, label='RIDGE', color='green', alpha=0.7)
+    plt.bar(x + width, lasso_weights, width, label='LASSO', color='red', alpha=0.7)
 
-    plt.xlabel('Features')
-    plt.ylabel('Coefficient Value')
-    plt.title('Comparison of Model Coefficients')
-    plt.xticks(x, feature_names, rotation=45, ha='right')
-    plt.legend()
+    # Customize the plot
+    plt.xlabel('Features', fontsize=12)
+    plt.ylabel('Coefficient Value', fontsize=12)
+    plt.title('Comparison of Model Coefficients', fontsize=14)
+    plt.xticks(x, feature_names, rotation=45, ha='right', fontsize=10)
+    plt.legend(fontsize=10)
+
+    # Add a horizontal line at y=0
+    plt.axhline(y=0, color='black', linestyle='-', alpha=0.3)
+
+    # Add grid lines for better readability
+    plt.grid(True, axis='y', linestyle='--', alpha=0.7)
+
     plt.tight_layout()
-    plt.grid(True, axis='y')
+    plt.show()
+
+
+def plot_predictions(X_test, y_test, basic_weights, basic_bias,
+                     ridge_weights, ridge_bias, lasso_weights, lasso_bias):
+    """
+    Plot the predictions from different models against actual values
+
+    Args:
+        X_test: Test features
+        y_test: Test target values
+        basic_weights, basic_bias: Parameters for basic linear regression
+        ridge_weights, ridge_bias: Parameters for RIDGE regression
+        lasso_weights, lasso_bias: Parameters for LASSO regression
+    """
+    # Generate predictions for all models
+    basic_pred = predict(X_test, basic_weights, basic_bias)
+    ridge_pred = predict(X_test, ridge_weights, ridge_bias)
+    lasso_pred = predict(X_test, lasso_weights, lasso_bias)
+
+    # Sample a subset of test data for clearer visualization (50 points)
+    sample_size = 50
+    indices = np.random.choice(len(y_test), sample_size, replace=False)
+
+    # Sort indices by actual values for better visualization
+    indices = indices[np.argsort(y_test[indices])]
+
+    # Get the sampled data
+    actual = y_test[indices]
+    basic_sampled = basic_pred[indices]
+    ridge_sampled = ridge_pred[indices]
+    lasso_sampled = lasso_pred[indices]
+
+    # Create the plot
+    plt.figure(figsize=(14, 8))
+
+    # Plot actual values
+    plt.plot(range(sample_size), actual, 'o-', label='Actual', linewidth=2, color='black')
+
+    # Plot predictions
+    plt.plot(range(sample_size), basic_sampled, 's--', label='Basic Linear Regression', alpha=0.7)
+    plt.plot(range(sample_size), ridge_sampled, '^--', label='RIDGE Regression', alpha=0.7)
+    plt.plot(range(sample_size), lasso_sampled, 'd--', label='LASSO Regression', alpha=0.7)
+
+    plt.title('Model Predictions vs Actual Values', fontsize=14)
+    plt.xlabel('Sample Index (sorted by actual value)', fontsize=12)
+    plt.ylabel('House Price', fontsize=12)
+    plt.legend(fontsize=10)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_model_comparison(basic_mse, ridge_mse, lasso_mse):
+    """
+    Plot a comparison of MSE values from different models
+
+    Args:
+        basic_mse: MSE from basic linear regression
+        ridge_mse: MSE from RIDGE regression
+        lasso_mse: MSE from LASSO regression
+    """
+    models = ['Basic Linear\nRegression', 'RIDGE\nRegression', 'LASSO\nRegression']
+    mse_values = [basic_mse, ridge_mse, lasso_mse]
+
+    # Create color map based on performance (lower is better)
+    colors = ['red', 'orange', 'green']
+    color_indices = np.argsort(np.argsort(mse_values))
+    bar_colors = [colors[idx] for idx in color_indices]
+
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(models, mse_values, color=bar_colors, alpha=0.7)
+
+    # Add value labels on top of each bar
+    for bar, value in zip(bars, mse_values):
+        plt.text(bar.get_x() + bar.get_width() / 2,
+                 value + max(mse_values) * 0.01,
+                 f'{value:.2f}',
+                 ha='center', va='bottom',
+                 fontweight='bold')
+
+    plt.title('Mean Squared Error Comparison', fontsize=14)
+    plt.ylabel('Mean Squared Error', fontsize=12)
+    plt.grid(True, axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
     plt.show()
 
 
@@ -452,6 +560,13 @@ if __name__ == "__main__":
 
     # Plot coefficients for comparison
     plot_coefficients(feature_names, basic_weights, ridge_weights, lasso_weights)
+
+    # Plot predictions comparison
+    plot_predictions(X_test, y_test, basic_weights, basic_bias,
+                     ridge_weights, ridge_bias, lasso_weights, lasso_bias)
+
+    # Plot MSE comparison
+    plot_model_comparison(basic_mse, ridge_mse, lasso_mse)
 
     # Check feature selection by LASSO
     print("\nFeature Selection by LASSO:")
